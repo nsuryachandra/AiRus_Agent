@@ -16,7 +16,7 @@ services:
         value: 10000
       - key: FRONTEND_URL
         fromService:
-          type: web
+          type: static
           name: airus-frontend
           property: host
       - key: DATABASE_URL
@@ -38,11 +38,8 @@ services:
   # -------------------------------------------------------------------------
   # 2. AiRus Frontend Static Site (React / Vite SPA / PWA)
   # -------------------------------------------------------------------------
-  - type: web
+  - type: static
     name: airus-frontend
-    runtime: static
-    plan: free
-    region: oregon
     buildCommand: npm install && npm run build --prefix client
     staticPublishPath: client/dist
     envVars:
