@@ -51,6 +51,9 @@ export default function MessageInput({
   };
 
   const handleMicToggle = () => {
+    if (isSpeaking) {
+      stopSpeaking();
+    }
     if (isListening) {
       stopListening();
     } else {

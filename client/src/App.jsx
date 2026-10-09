@@ -14,14 +14,18 @@ import { api } from './services/api';
 export default function App() {
   const { user } = useAuth();
   const {
+    voiceState,
     isListening,
     transcript,
     isSpeaking,
     autoSpeak,
+    continuousMode,
+    settings,
     speak,
     stopSpeaking,
     startListening,
     stopListening,
+    interrupt,
     recognitionError
   } = useVoice();
 
@@ -115,14 +119,15 @@ export default function App() {
 
   // 4. Calculate actual AI Orb State strictly based on real system state
   const orbState = useMemo(() => {
-    if (appError || recognitionError) return 'error';
-    if (isAiLoading) return 'thinking';
-    if (isSpeaking) return 'speaking';
-    if (isListening) {
+    if (appError || recognitionError || voiceState === 'error') return 'error';
+    if (isAiLoading || voiceState === 'processing') return 'thinking';
+    if (isSpeaking || voiceState === 'speaking') return 'speaking';
+    if (voiceState === 'transcribing') return 'transcribing';
+    if (isListening || voiceState === 'listening') {
       return transcript ? 'transcribing' : 'listening';
     }
     return 'idle';
-  }, [isAiLoading, isSpeaking, isListening, transcript, appError, recognitionError]);
+  }, [isAiLoading, isSpeaking, isListening, transcript, appError, recognitionError, voiceState]);
 
   // 5. Create New Conversation
   const handleNewConversation = async () => {
@@ -164,7 +169,7 @@ export default function App() {
     }
   };
 
-  // 7. Send Message Flow
+  // 7. Send Message Flow with Talkative Voice Continuity
   const handleSendMessage = async (text) => {
     if (!user) {
       setAuthOpen(true);
@@ -202,7 +207,9 @@ export default function App() {
     setIsAiLoading(true);
 
     try {
-      const res = await api.sendMessage(targetConvId, text);
+      const verbosity = settings?.verbosity || 'natural';
+      const res = await api.sendMessage(targetConvId, text, { verbosity });
+
       if (res.success && res.assistantMessage) {
         setMessages(prev => [
           ...prev.filter(m => m.id !== tempUserMsg.id),
@@ -210,9 +217,18 @@ export default function App() {
           res.assistantMessage
         ]);
 
-        // Speak response aloud if auto-speak is enabled
+        // Speak response aloud if auto-speak is enabled, passing continuous resume loop
         if (autoSpeak) {
-          speak(res.assistantMessage.content);
+          speak(res.assistantMessage.content, () => {
+            // Triggered only if continuousMode is true and user hasn't interrupted
+            if (continuousMode) {
+              startListening((nextSpoken) => {
+                if (nextSpoken && nextSpoken.trim()) {
+                  handleSendMessage(nextSpoken.trim());
+                }
+              });
+            }
+          });
         }
 
         // Refresh conversation titles in drawer
@@ -227,10 +243,10 @@ export default function App() {
     }
   };
 
-  // 8. Tapping Orb activates/stops Voice
+  // 8. Tapping Orb activates/interrupts Voice cleanly
   const handleOrbClick = () => {
     if (isSpeaking) {
-      stopSpeaking();
+      interrupt();
     } else if (isListening) {
       stopListening();
     } else {

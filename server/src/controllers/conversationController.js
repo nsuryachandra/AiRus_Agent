@@ -98,7 +98,8 @@ export async function deleteConversation(req, res, next) {
 export async function sendMessage(req, res, next) {
   try {
     const { id } = req.params;
-    const { content } = req.body;
+    const { content, verbosity, style } = req.body;
+    const conversationVerbosity = verbosity || style || 'natural';
 
     if (!content || typeof content !== 'string' || !content.trim()) {
       return res.status(400).json({
@@ -146,7 +147,9 @@ export async function sendMessage(req, res, next) {
     // Query NVIDIA AI Service
     let aiResponse;
     try {
-      aiResponse = await generateChatResponse(priorMessagesResult.rows, trimmedContent);
+      aiResponse = await generateChatResponse(priorMessagesResult.rows, trimmedContent, {
+        verbosity: conversationVerbosity
+      });
     } catch (aiErr) {
       console.error('[AI Generation Failure]', aiErr.message);
       // We return the error cleanly to the user; user message was stored

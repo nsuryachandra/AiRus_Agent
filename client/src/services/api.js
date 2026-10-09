@@ -97,9 +97,12 @@ export const api = {
       method: 'DELETE'
     }),
 
-  sendMessage: (conversationId, content) =>
+  sendMessage: (conversationId, content, options = {}) =>
     request(`/conversations/${conversationId}/messages`, {
       method: 'POST',
-      body: JSON.stringify({ content })
+      body: JSON.stringify({
+        content,
+        verbosity: options.verbosity || options.style || 'natural'
+      })
     })
 };
