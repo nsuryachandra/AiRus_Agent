@@ -1,0 +1,77 @@
+services:
+  # -------------------------------------------------------------------------
+  # 1. AiRus Backend API Service (Node.js / Express)
+  # -------------------------------------------------------------------------
+  - type: web
+    name: airus-backend
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm install --prefix server
+    startCommand: npm start --prefix server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: airus-frontend
+          property: host
+      - key: DATABASE_URL
+        fromDatabase:
+          name: airus-postgres
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: NVIDIA_BASE_URL
+        value: https://integrate.api.nvidia.com/v1
+      - key: NVIDIA_MODEL
+        value: meta/llama-3.1-70b-instruct
+    healthCheckPath: /api/health
+
+  # -------------------------------------------------------------------------
+  # 2. AiRus Frontend Static Site (React / Vite SPA / PWA)
+  # -------------------------------------------------------------------------
+  - type: web
+    name: airus-frontend
+    runtime: static
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build --prefix client
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: airus-backend
+          property: host
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+# ---------------------------------------------------------------------------
+# 3. Persistent PostgreSQL Database
+# ---------------------------------------------------------------------------
+databases:
+  - name: airus-postgres
+    plan: free
+    region: oregon
+    databaseName: airus_db
+    user: airus_user

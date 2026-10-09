@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e1b4b" />
+      <stop offset="70%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#05070c" />
+    </radialGradient>
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="1" />
+      <stop offset="45%" stop-color="#6366f1" stop-opacity="0.8" />
+      <stop offset="80%" stop-color="#a855f7" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#090d16" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="ringGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur1" />
+      <feGaussianBlur in="SourceGraphic" stdDeviation="24" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGlow)" />
+
+  <!-- Outer Pulsing Orbit Ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#ringGrad1)" stroke-width="4" stroke-dasharray="14 18" opacity="0.6" />
+
+  <!-- Middle Orbit Ring -->
+  <circle cx="256" cy="256" r="140" fill="none" stroke="#38bdf8" stroke-width="3" opacity="0.4" />
+
+  <!-- Ambient Radiant Core -->
+  <circle cx="256" cy="256" r="120" fill="url(#coreGlow)" filter="url(#neonGlow)" />
+
+  <!-- Core Sphere -->
+  <circle cx="256" cy="256" r="64" fill="#0f172a" stroke="#38bdf8" stroke-width="4" />
+
+  <!-- AiRus Soundwave Symbol -->
+  <g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round">
+    <line x1="200" y1="240" x2="200" y2="272" stroke="#38bdf8" />
+    <line x1="222" y1="220" x2="222" y2="292" stroke="#818cf8" />
+    <line x1="244" y1="200" x2="244" y2="312" stroke="#c084fc" />
+    <line x1="256" y1="185" x2="256" y2="327" stroke="#ffffff" />
+    <line x1="268" y1="200" x2="268" y2="312" stroke="#c084fc" />
+    <line x1="290" y1="220" x2="290" y2="292" stroke="#818cf8" />
+    <line x1="312" y1="240" x2="312" y2="272" stroke="#38bdf8" />
+  </g>
+
+  <!-- Central Energy Spark -->
+  <circle cx="256" cy="256" r="8" fill="#ffffff" filter="url(#neonGlow)" />
+</svg>

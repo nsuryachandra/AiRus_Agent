@@ -1,0 +1,26 @@
+{
+  "name": "airus-root",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AiRus - Production-Minded Personal Voice AI Assistant",
+  "private": true,
+  "scripts": {
+    "setup": "npm install && npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently -k -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "build:server": "echo \"Server is ready for Node.js production runtime\"",
+    "start": "npm start --prefix server",
+    "test": "npm test --prefix server && npm test --prefix client",
+    "test:server": "npm test --prefix server",
+    "test:client": "npm test --prefix client",
+    "migrate": "node server/scripts/migrate.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
